@@ -7,10 +7,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.expensetracker.data.ExpenseDatabase
+import com.example.expensetracker.data.ExpenseRepository
+import com.example.expensetracker.ui.ExpenseTrackerScreen
+import com.example.expensetracker.ui.ExpenseViewModel
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,8 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ExpenseTrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    ExpenseTrackerApp(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -31,17 +34,16 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
+fun ExpenseTrackerApp(
+    modifier: Modifier = Modifier,
+    viewModel: ExpenseViewModel = viewModel {
+        val database = ExpenseDatabase.getDatabase(LocalContext.current)
+        val repository = ExpenseRepository(database.expenseDao())
+        ExpenseViewModel(repository)
+    }
+) {
+    ExpenseTrackerScreen(
+        viewModel = viewModel,
         modifier = modifier
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ExpenseTrackerTheme {
-        Greeting("Android")
-    }
 }
